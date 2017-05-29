@@ -7,6 +7,8 @@ using Cmas.Services.Users.Dtos.Requests;
 using Cmas.Services.Users.Dtos.Responses;
 using Microsoft.Extensions.Logging;
 using Nancy;
+using Cmas.Infrastructure.ErrorHandler;
+using Cmas.BusinessLayers.Users.Entities;
 
 namespace Cmas.Services.Users
 {
@@ -18,10 +20,9 @@ namespace Cmas.Services.Users
 
         public UsersService(IServiceProvider serviceProvider, NancyContext ctx)
         {
-           
-            var _loggerFactory = (ILoggerFactory)serviceProvider.GetService(typeof(ILoggerFactory));
+            var _loggerFactory = (ILoggerFactory) serviceProvider.GetService(typeof(ILoggerFactory));
 
-            _autoMapper = (IMapper)serviceProvider.GetService(typeof(IMapper));
+            _autoMapper = (IMapper) serviceProvider.GetService(typeof(IMapper));
 
             _usersBusinessLayer = new UsersBusinessLayer(serviceProvider, ctx.CurrentUser);
 
@@ -35,7 +36,12 @@ namespace Cmas.Services.Users
         {
             var result = new List<SimpleUserResponse>();
 
-            var users = await _usersBusinessLayer.GetUser();
+            var users = await _usersBusinessLayer.GetUsers();
+
+            foreach (var user in users)
+            {
+                result.Add(_autoMapper.Map<SimpleUserResponse>(user));
+            }
 
             return result;
         }
@@ -45,7 +51,14 @@ namespace Cmas.Services.Users
         /// </summary>
         public async Task<DetailedUserResponse> GetUserAsync(string userId)
         {
-            throw new NotImplementedException();
+            var user = await _usersBusinessLayer.GetUserById(userId);
+
+            if (user == null)
+            {
+                throw new NotFoundErrorException();
+            }
+
+            return _autoMapper.Map<DetailedUserResponse>(user);
         }
 
         /// <summary>
@@ -53,7 +66,7 @@ namespace Cmas.Services.Users
         /// </summary>
         public async Task<string> CreateUserAsync()
         {
-            throw new NotImplementedException();
+            return await _usersBusinessLayer.CreateUser();
         }
 
         /// <summary>
@@ -61,17 +74,24 @@ namespace Cmas.Services.Users
         /// </summary>
         public async Task<string> UpdateUserAsync(string userId, UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            User currentUser = await _usersBusinessLayer.GetUser(userId);
+
+            if (currentUser == null)
+            {
+                throw new NotFoundErrorException();
+            }
+
+            User newUser = _autoMapper.Map<UpdateUserRequest, User>(request, currentUser);
+
+            return await _usersBusinessLayer.UpdateUser(newUser);
         }
 
         /// <summary>
         /// Удалить пользователя
         /// </summary>
-        public async Task<string> DeleteUserAsync(string contractId)
+        public async Task<string> DeleteUserAsync(string userId)
         {
-            throw new NotImplementedException();
+            return await _usersBusinessLayer.DeleteUser(userId);
         }
-         
-
     }
 }
