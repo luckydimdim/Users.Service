@@ -40,7 +40,12 @@ namespace Cmas.Services.Users
 
             foreach (var user in users)
             {
-                result.Add(_autoMapper.Map<SimpleUserResponse>(user));
+                var resultUser = _autoMapper.Map<SimpleUserResponse>(user);
+
+                resultUser.isActivated = string.IsNullOrEmpty(user.actHash) && !string.IsNullOrEmpty(user.PasswordHash);
+                resultUser.isActivating = !string.IsNullOrEmpty(user.actHash);
+
+                result.Add(resultUser);
             }
 
             return result;
@@ -51,14 +56,19 @@ namespace Cmas.Services.Users
         /// </summary>
         public async Task<DetailedUserResponse> GetUserAsync(string userId)
         {
-            var user = await _usersBusinessLayer.GetUserById(userId);
+            User user = await _usersBusinessLayer.GetUserById(userId);
 
             if (user == null)
             {
                 throw new NotFoundErrorException();
             }
 
-            return _autoMapper.Map<DetailedUserResponse>(user);
+            var resultUser = _autoMapper.Map<DetailedUserResponse>(user);
+
+            resultUser.isActivated = string.IsNullOrEmpty(user.actHash) && !string.IsNullOrEmpty(user.PasswordHash);
+            resultUser.isActivating = !string.IsNullOrEmpty(user.actHash);
+
+            return resultUser;
         }
 
         /// <summary>
