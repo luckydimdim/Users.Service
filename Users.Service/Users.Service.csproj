@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <Version>1.0.0</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>yamal</Authors>
+    <Company>yamal</Company>
+    <Product>CMAS</Product>
+    <Description>users module</Description>
+    <AssemblyName>Cmas.Services.Users</AssemblyName>
+    <RootNamespace>Cmas.Services.Users</RootNamespace>
+    <PackageId>Cmas.Services.Users</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Criteria\**" />
+    <EmbeddedResource Remove="Criteria\**" />
+    <None Remove="Criteria\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.0.2" />
+    <PackageReference Include="Cmas.Infrastructure.Domain" Version="*" />
+    <PackageReference Include="Cmas.BusinessLayers.Users" Version="*" />
+    <PackageReference Include="Cmas.Infrastructure.Security" Version="*" />
+    <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
+  </ItemGroup>
+
+</Project>
