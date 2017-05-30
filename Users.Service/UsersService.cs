@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Cmas.BusinessLayers.Users;
@@ -52,6 +53,21 @@ namespace Cmas.Services.Users
         }
 
         /// <summary>
+        /// Проверить существование пользователя
+        /// </summary>
+        public async Task<bool> IsUserExistAsync(string login)
+        {
+            User user = await _usersBusinessLayer.GetUserByLogin(login);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Получить пользователя
         /// </summary>
         public async Task<DetailedUserResponse> GetUserAsync(string userId)
@@ -74,9 +90,15 @@ namespace Cmas.Services.Users
         /// <summary>
         /// Создать пользователя
         /// </summary>
-        public async Task<string> CreateUserAsync()
+        public async Task<string> CreateUserAsync(CreateUserRequest request)
         {
-            return await _usersBusinessLayer.CreateUser();
+
+            if (await _usersBusinessLayer.GetUserByLogin(request.Login) != null)
+            {
+                throw new Exception("User with this login already exist");
+            }
+             
+            return await _usersBusinessLayer.CreateUser(request.Login, request.Name, request.Roles.Select(s=>s.ToString().ToUpper()).ToList());
         }
 
         /// <summary>
@@ -84,7 +106,7 @@ namespace Cmas.Services.Users
         /// </summary>
         public async Task<string> UpdateUserAsync(string userId, UpdateUserRequest request)
         {
-            User currentUser = await _usersBusinessLayer.GetUser(userId);
+            User currentUser = await _usersBusinessLayer.GetUserById(userId);
 
             if (currentUser == null)
             {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cmas.Services.Users.Dtos.Requests
 {
-    public class UpdateUserRequest
+    public class CreateUserRequest
     {
       
         /// <summary>
@@ -15,13 +15,11 @@ namespace Cmas.Services.Users.Dtos.Requests
         /// Имя пользователя
         /// </summary>
         public string Name;
-
-
+         
         /// <summary>
         /// Роли
         /// </summary>
         public IEnumerable<Role> Roles;
-
-       
+         
     }
 }

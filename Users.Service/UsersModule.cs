@@ -48,6 +48,11 @@ namespace Cmas.Services.Users
             Get<DetailedUserResponse>("/{id}", GetUserHandlerAsync);
 
             /// <summary>
+            /// Получить пользователя по ID
+            /// </summary>
+            Get<bool>("/is-user-exist/{login}", GetUserExistingHandlerAsync);
+
+            /// <summary>
             /// Создать пользователя
             /// </summary>
             Post<string>("/", CreateUserHandlerAsync);
@@ -65,6 +70,11 @@ namespace Cmas.Services.Users
 
         #region Обработчики
 
+        private async Task<bool> GetUserExistingHandlerAsync(dynamic args, CancellationToken ct)
+        {
+            return await _usersService.IsUserExistAsync(args.login);
+        }
+
         private async Task<IEnumerable<SimpleUserResponse>> GetUsersHandlerAsync(dynamic args,  CancellationToken ct)
         {
             return await _usersService.GetUsersAsync();
@@ -77,7 +87,16 @@ namespace Cmas.Services.Users
 
         private async Task<string> CreateUserHandlerAsync(dynamic args, CancellationToken ct)
         {
-            return  await _usersService.CreateUserAsync();
+            var request = this.Bind<CreateUserRequest>();
+
+            var validationResult = this.Validate(request);
+
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationErrorException(validationResult.FormattedErrors);
+            }
+
+            return  await _usersService.CreateUserAsync(request);
         }
 
         private async Task<string> UpdateUserHandlerAsync(dynamic args, CancellationToken ct)
