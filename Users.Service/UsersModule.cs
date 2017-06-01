@@ -33,7 +33,7 @@ namespace Cmas.Services.Users
         public UsersModule(IServiceProvider serviceProvider) : base("/users")
         {
             this.RequiresAuthentication();
-            this.RequiresRoles(new[] { Role.Administrator });
+            this.RequiresAnyRole(new[] { Role.Administrator });
             _serviceProvider = serviceProvider;
 
 
